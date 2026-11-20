@@ -1,45 +1,51 @@
+"""Watson core: time tracking state, frames, configuration and sync."""
+
 import datetime
-from functools import reduce
 import json
 import operator
 import os
 import uuid
 from configparser import Error as CFGParserError
+from functools import reduce
+
 import arrow
-from dateutil import tz
 import click
+from dateutil import tz
 
 from .config import ConfigParser
 from .frames import Frames
 from .utils import deduplicate, make_json_writer, safe_save, sorted_groupby
 from .version import version as __version__  # noqa
 
+# Remote backend requests timeout (in seconds)
+REQUEST_TIMEOUT = 30
+
 
 class WatsonError(RuntimeError):
-    pass
+    """Watson base error."""
 
 
 class ConfigurationError(CFGParserError, WatsonError):
-    pass
+    """Watson configuration error."""
 
 
 class Watson(object):
+    """Watson time tracker."""
+
     def __init__(self, **kwargs):
-        """
-        :param frames: If given, should be a list representing the
-                        frames.
-                        If not given, the value is extracted
-                        from the frames file.
-        :type frames: list
+        """Initialize Watson.
 
-        :param current: If given, should be a dict representing the
-                        current frame.
-                        If not given, the value is extracted
-                        from the state file.
-        :type current: dict
+        Args:
+            **kwargs: optional keyword arguments:
 
-        :param config_dir: If given, the directory where the configuration
-                           files will be
+                - frames (list): the frames. If not given, the value is
+                  extracted from the frames file.
+                - current (dict): the current frame. If not given, the value is
+                  extracted from the state file.
+                - last_sync: the last synchronization date. If not given, the
+                  value is extracted from the last_sync file.
+                - config_dir (str): the directory where the configuration files
+                  will be.
         """
         self._current = None
         self._old_state = None
@@ -48,28 +54,26 @@ class Watson(object):
         self._config = None
         self._config_changed = False
 
-        self._dir = (kwargs.pop('config_dir', None) or
-                     click.get_app_dir('watson'))
+        self._dir = kwargs.pop("config_dir", None) or click.get_app_dir("watson")
 
-        self.config_file = os.path.join(self._dir, 'config')
-        self.frames_file = os.path.join(self._dir, 'frames')
-        self.state_file = os.path.join(self._dir, 'state')
-        self.last_sync_file = os.path.join(self._dir, 'last_sync')
+        self.config_file = os.path.join(self._dir, "config")
+        self.frames_file = os.path.join(self._dir, "frames")
+        self.state_file = os.path.join(self._dir, "state")
+        self.last_sync_file = os.path.join(self._dir, "last_sync")
 
-        if 'frames' in kwargs:
-            self.frames = kwargs['frames']
+        if "frames" in kwargs:
+            self.frames = kwargs["frames"]
 
-        if 'current' in kwargs:
-            self.current = kwargs['current']
+        if "current" in kwargs:
+            self.current = kwargs["current"]
 
-        if 'last_sync' in kwargs:
-            self.last_sync = kwargs['last_sync']
+        if "last_sync" in kwargs:
+            self.last_sync = kwargs["last_sync"]
 
     def _load_json_file(self, filename, type=dict):
-        """
-        Return the content of the the given JSON file.
-        If the file doesn't exist, return an empty instance of the
-        given type.
+        """Return the content of the the given JSON file.
+
+        If the file doesn't exist, return an empty instance of the given type.
         """
         try:
             with open(filename) as f:
@@ -83,15 +87,11 @@ class Watson(object):
             if os.path.getsize(filename) == 0:
                 return type()
             else:
-                raise WatsonError(
-                    "Invalid JSON file {}: {}".format(filename, e)
-                )
+                raise WatsonError("Invalid JSON file {}: {}".format(filename, e)) from e
         except Exception as e:
             raise WatsonError(
-                "Unexpected error while loading JSON file {}: {}".format(
-                    filename, e
-                )
-            )
+                "Unexpected error while loading JSON file {}: {}".format(filename, e)
+            ) from e
 
     def _parse_date(self, date):
         """Returns Arrow object from timestamp."""
@@ -106,16 +106,15 @@ class Watson(object):
 
     @property
     def config(self):
-        """
-        Return Watson's config as a ConfigParser object.
-        """
+        """Return Watson's config as a ConfigParser object."""
         if not self._config:
             try:
                 config = ConfigParser()
                 config.read(self.config_file)
             except CFGParserError as e:
                 raise ConfigurationError(
-                    "Cannot parse config file: {}".format(e))
+                    "Cannot parse config file: {}".format(e)
+                ) from e
 
             self._config = config
 
@@ -123,16 +122,12 @@ class Watson(object):
 
     @config.setter
     def config(self, value):
-        """
-        Set a ConfigParser object as the current configuration.
-        """
+        """Set a ConfigParser object as the current configuration."""
         self._config = value
         self._config_changed = True
 
     def save(self):
-        """
-        Save the state in the appropriate files. Create them if necessary.
-        """
+        """Save the state in the appropriate files. Create them if necessary."""
         try:
             if not os.path.isdir(self._dir):
                 os.makedirs(self._dir)
@@ -140,9 +135,9 @@ class Watson(object):
             if self._current is not None and self._old_state != self._current:
                 if self.is_started:
                     current = {
-                        'project': self.current['project'],
-                        'start': self._format_date(self.current['start']),
-                        'tags': self.current['tags'],
+                        "project": self.current["project"],
+                        "start": self._format_date(self.current["start"]),
+                        "tags": self.current["tags"],
                     }
                 else:
                     current = {}
@@ -151,22 +146,22 @@ class Watson(object):
                 self._old_state = current
 
             if self._frames is not None and self._frames.changed:
-                safe_save(self.frames_file,
-                          make_json_writer(self.frames.dump))
+                safe_save(self.frames_file, make_json_writer(self.frames.dump))
 
             if self._config_changed:
                 safe_save(self.config_file, self.config.write)
 
             if self._last_sync is not None:
-                safe_save(self.last_sync_file,
-                          make_json_writer(self._format_date, self.last_sync))
+                safe_save(
+                    self.last_sync_file,
+                    make_json_writer(self._format_date, self.last_sync),
+                )
         except OSError as e:
-            raise WatsonError(
-                "Impossible to write {}: {}".format(e.filename, e)
-            )
+            raise WatsonError("Impossible to write {}: {}".format(e.filename, e)) from e
 
     @property
     def frames(self):
+        """Return all frames (loaded from the frames file if needed)."""
         if self._frames is None:
             self.frames = self._load_json_file(self.frames_file, type=list)
 
@@ -178,6 +173,7 @@ class Watson(object):
 
     @property
     def current(self):
+        """Return the current frame (loaded from the state file if needed)."""
         if self._current is None:
             self.current = self._load_json_file(self.state_file)
 
@@ -188,7 +184,7 @@ class Watson(object):
 
     @current.setter
     def current(self, value):
-        if not value or 'project' not in value:
+        if not value or "project" not in value:
             self._current = {}
 
             if self._old_state is None:
@@ -196,15 +192,15 @@ class Watson(object):
 
             return
 
-        start = value.get('start', arrow.now())
+        start = value.get("start", arrow.now())
 
         if not isinstance(start, arrow.Arrow):
             start = self._parse_date(start)
 
         self._current = {
-            'project': value['project'],
-            'start': start,
-            'tags': value.get('tags') or []
+            "project": value["project"],
+            "start": start,
+            "tags": value.get("tags") or [],
         }
 
         if self._old_state is None:
@@ -212,10 +208,9 @@ class Watson(object):
 
     @property
     def last_sync(self):
+        """Return the last synchronization date."""
         if self._last_sync is None:
-            self.last_sync = self._load_json_file(
-                self.last_sync_file, type=int
-            )
+            self.last_sync = self._load_json_file(self.last_sync_file, type=int)
 
         return self._last_sync
 
@@ -232,30 +227,30 @@ class Watson(object):
 
     @property
     def is_started(self):
+        """Return whether a project is currently started."""
         return bool(self.current)
 
     def add(self, project, from_date, to_date, tags):
+        """Add a frame that was not tracked live."""
         if not project:
             raise WatsonError("No project given.")
         if from_date > to_date:
             raise WatsonError("Task cannot end before it starts.")
 
-        default_tags = self.config.getlist('default_tags', project)
+        default_tags = self.config.getlist("default_tags", project)
         tags = (tags or []) + default_tags
 
         frame = self.frames.add(project, from_date, to_date, tags=tags)
         return frame
 
-    def start(self, project, tags=None, restart=False, start_at=None,
-              gap=True):
+    def start(self, project, tags=None, restart=False, start_at=None, gap=True):
+        """Start tracking time for the given project."""
         if self.is_started:
             raise WatsonError(
-                "Project {} is already started.".format(
-                    self.current['project']
-                )
+                "Project {} is already started.".format(self.current["project"])
             )
 
-        default_tags = self.config.getlist('default_tags', project)
+        default_tags = self.config.getlist("default_tags", project)
         if not restart:
             tags = (tags or []) + default_tags
 
@@ -266,20 +261,20 @@ class Watson(object):
             # and previous frames exist
             stop_of_prev_frame = self.frames[-1].stop
             if start_at < stop_of_prev_frame:
-                raise WatsonError('Task cannot start before the previous task '
-                                  'ends.')
+                raise WatsonError("Task cannot start before the previous task ends.")
         if start_at > arrow.now():
-            raise WatsonError('Task cannot start in the future.')
+            raise WatsonError("Task cannot start in the future.")
 
-        new_frame = {'project': project, 'tags': deduplicate(tags)}
-        new_frame['start'] = start_at
+        new_frame = {"project": project, "tags": deduplicate(tags)}
+        new_frame["start"] = start_at
         if not gap:
             stop_of_prev_frame = self.frames[-1].stop
-            new_frame['start'] = stop_of_prev_frame
+            new_frame["start"] = stop_of_prev_frame
         self.current = new_frame
         return self.current
 
     def stop(self, stop_at=None):
+        """Stop tracking time for the current project."""
         if not self.is_started:
             raise WatsonError("No project started.")
 
@@ -292,19 +287,18 @@ class Watson(object):
             # stop function and calling it, the value of `stop_at` could be
             # outdated if defined using a default argument.
             stop_at = arrow.now()
-        if old['start'] > stop_at:
-            raise WatsonError('Task cannot end before it starts.')
+        if old["start"] > stop_at:
+            raise WatsonError("Task cannot end before it starts.")
         if stop_at > arrow.now():
-            raise WatsonError('Task cannot end in the future.')
+            raise WatsonError("Task cannot end in the future.")
 
-        frame = self.frames.add(
-            old['project'], old['start'], stop_at, tags=old['tags']
-        )
+        frame = self.frames.add(old["project"], old["start"], stop_at, tags=old["tags"])
         self.current = None
 
         return frame
 
     def cancel(self):
+        """Cancel the current frame."""
         if not self.is_started:
             raise WatsonError("No project started.")
 
@@ -314,29 +308,22 @@ class Watson(object):
 
     @property
     def projects(self):
-        """
-        Return the list of all the existing projects, sorted by name.
-        """
-        return sorted(set(self.frames['project']))
+        """Return the list of all the existing projects, sorted by name."""
+        return sorted(set(self.frames["project"]))
 
     @property
     def tags(self):
-        """
-        Return the list of the tags, sorted by name.
-        """
-        return sorted(set(tag for tags in self.frames['tags'] for tag in tags))
+        """Return the list of the tags, sorted by name."""
+        return sorted({tag for tags in self.frames["tags"] for tag in tags})
 
     def _get_request_info(self, route):
         config = self.config
 
-        dest = config.get('backend', 'url')
-        token = config.get('backend', 'token')
+        dest = config.get("backend", "url")
+        token = config.get("backend", "token")
 
         if dest and token:
-            dest = "{}/{}/".format(
-                dest.rstrip('/'),
-                route.strip('/')
-            )
+            dest = "{}/{}/".format(dest.rstrip("/"), route.strip("/"))
         else:
             raise ConfigurationError(
                 "You must specify a remote URL (backend.url) and a token "
@@ -344,98 +331,115 @@ class Watson(object):
             )
 
         headers = {
-            'content-type': 'application/json',
-            'Authorization': "Token {}".format(token)
+            "content-type": "application/json",
+            "Authorization": "Token {}".format(token),
         }
 
         return dest, headers
 
     def _get_remote_projects(self):
         # import when required in order to reduce watson response time (#312)
-        import requests
-        if not hasattr(self, '_remote_projects'):
-            dest, headers = self._get_request_info('projects')
+        import requests  # noqa: PLC0415
+
+        if not hasattr(self, "_remote_projects"):
+            dest, headers = self._get_request_info("projects")
 
             try:
-                response = requests.get(dest, headers=headers)
-                assert response.status_code == 200
+                response = requests.get(dest, headers=headers, timeout=REQUEST_TIMEOUT)
+            except requests.ConnectionError as e:
+                raise WatsonError("Unable to reach the server.") from e
 
-                self._remote_projects = response.json()
-            except requests.ConnectionError:
-                raise WatsonError("Unable to reach the server.")
-            except AssertionError:
+            if response.status_code != requests.codes.ok:
                 raise WatsonError(
-                    "An error occurred with the remote "
-                    "server: {}".format(response.json())
+                    "An error occurred with the remote server: {}".format(
+                        response.json()
+                    )
                 )
 
-        return self._remote_projects['projects']
+            self._remote_projects = response.json()
+
+        return self._remote_projects["projects"]
 
     def pull(self):
-        import requests
-        dest, headers = self._get_request_info('frames')
+        """Pull frames from the remote backend."""
+        # import when required in order to reduce watson response time (#312)
+        import requests  # noqa: PLC0415
+
+        dest, headers = self._get_request_info("frames")
 
         try:
             response = requests.get(
-                dest, params={'last_sync': self.last_sync}, headers=headers
+                dest,
+                params={"last_sync": self.last_sync},
+                headers=headers,
+                timeout=REQUEST_TIMEOUT,
             )
-            assert response.status_code == 200
-        except requests.ConnectionError:
-            raise WatsonError("Unable to reach the server.")
-        except AssertionError:
+        except requests.ConnectionError as e:
+            raise WatsonError("Unable to reach the server.") from e
+
+        if response.status_code != requests.codes.ok:
             raise WatsonError(
-                "An error occurred with the remote "
-                "server: {}".format(response.json())
+                "An error occurred with the remote server: {}".format(response.json())
             )
 
         frames = response.json() or ()
 
         for frame in frames:
-            frame_id = uuid.UUID(frame['id']).hex
+            frame_id = uuid.UUID(frame["id"]).hex
             self.frames[frame_id] = (
-                frame['project'],
-                frame['begin_at'],
-                frame['end_at'],
-                frame['tags']
+                frame["project"],
+                frame["begin_at"],
+                frame["end_at"],
+                frame["tags"],
             )
 
         return frames
 
     def push(self, last_pull):
-        import requests
-        dest, headers = self._get_request_info('frames/bulk')
+        """Push frames updated since the last synchronization to the backend."""
+        # import when required in order to reduce watson response time (#312)
+        import requests  # noqa: PLC0415
+
+        dest, headers = self._get_request_info("frames/bulk")
 
         frames = []
 
         for frame in self.frames:
             if last_pull > frame.updated_at > self.last_sync:
-                frames.append({
-                    'id': uuid.UUID(frame.id).urn,
-                    'begin_at': str(frame.start.to('utc')),
-                    'end_at': str(frame.stop.to('utc')),
-                    'project': frame.project,
-                    'tags': frame.tags
-                })
+                frames.append(
+                    {
+                        "id": uuid.UUID(frame.id).urn,
+                        "begin_at": str(frame.start.to("utc")),
+                        "end_at": str(frame.stop.to("utc")),
+                        "project": frame.project,
+                        "tags": frame.tags,
+                    }
+                )
 
         try:
-            response = requests.post(dest, json.dumps(frames), headers=headers)
-            assert response.status_code == 201
-        except requests.ConnectionError:
-            raise WatsonError("Unable to reach the server.")
-        except AssertionError:
+            response = requests.post(
+                dest, json.dumps(frames), headers=headers, timeout=REQUEST_TIMEOUT
+            )
+        except requests.ConnectionError as e:
+            raise WatsonError("Unable to reach the server.") from e
+
+        if response.status_code != requests.codes.created:
             raise WatsonError(
                 "An error occurred with the remote server (status: {}). "
-                "Response was:\n{}".format(
-                    response.status_code,
-                    response.text
-                )
+                "Response was:\n{}".format(response.status_code, response.text)
             )
 
         return frames
 
     def merge_report(self, frames_with_conflict):
-        conflict_file_frames = Frames(self._load_json_file(
-                                      frames_with_conflict, type=list))
+        """Compare frames with the given conflicting frames file.
+
+        Returns:
+            A tuple of conflicting frames and frames to merge.
+        """
+        conflict_file_frames = Frames(
+            self._load_json_file(frames_with_conflict, type=list)
+        )
         conflicting = []
         merging = []
 
@@ -456,19 +460,34 @@ class Watson(object):
 
     def _validate_report_options(self, filtrate, ignored):
         return not bool(
-            filtrate and ignored and set(filtrate).intersection(set(ignored)))
+            filtrate and ignored and set(filtrate).intersection(set(ignored))
+        )
 
-    def report(self, from_, to, current=None, projects=None, tags=None,
-               ignore_projects=None, ignore_tags=None, year=None,
-               month=None, week=None, day=None, luna=None, all=None,
-               include_partial_frames=False):
-        for start_time in (_ for _ in [day, week, month, year, luna, all]
-                           if _ is not None):
+    def report(  # noqa: PLR0913, PLR0917
+        self,
+        from_,
+        to,
+        current=None,
+        projects=None,
+        tags=None,
+        ignore_projects=None,
+        ignore_tags=None,
+        year=None,
+        month=None,
+        week=None,
+        day=None,
+        luna=None,
+        all=None,
+        include_partial_frames=False,
+    ):
+        """Build a report of time spent on projects and tags in a timespan."""
+        for start_time in (
+            _ for _ in [day, week, month, year, luna, all] if _ is not None
+        ):
             from_ = start_time
 
         if not self._validate_report_options(projects, ignore_projects):
-            raise WatsonError(
-                "given projects can't be ignored at the same time")
+            raise WatsonError("given projects can't be ignored at the same time")
 
         if not self._validate_report_options(tags, ignore_tags):
             raise WatsonError("given tags can't be ignored at the same time")
@@ -477,76 +496,80 @@ class Watson(object):
             raise WatsonError("'from' must be anterior to 'to'")
 
         if current is None:
-            current = self.config.getboolean('options', 'report_current')
+            current = self.config.getboolean("options", "report_current")
 
         if self.current and current:
             cur = self.current
-            self.frames.add(cur['project'], cur['start'], arrow.utcnow(),
-                            cur['tags'], id="current")
+            self.frames.add(
+                cur["project"], cur["start"], arrow.utcnow(), cur["tags"], id="current"
+            )
 
         span = self.frames.span(from_, to)
 
         frames_by_project = sorted_groupby(
             self.frames.filter(
-                projects=projects or None, tags=tags or None,
+                projects=projects or None,
+                tags=tags or None,
                 ignore_projects=ignore_projects or None,
                 ignore_tags=ignore_tags or None,
-                span=span, include_partial_frames=include_partial_frames,
+                span=span,
+                include_partial_frames=include_partial_frames,
             ),
-            operator.attrgetter('project')
+            operator.attrgetter("project"),
         )
 
         if self.current and current:
-            del self.frames['current']
+            del self.frames["current"]
 
         total = datetime.timedelta()
 
         report = {
-             'timespan': {
-                 'from': span.start,
-                 'to': span.stop,
-             },
-             'projects': []
-         }
+            "timespan": {
+                "from": span.start,
+                "to": span.stop,
+            },
+            "projects": [],
+        }
 
-        for project, frames in frames_by_project:
-            frames = tuple(frames)
+        for project, project_frames in frames_by_project:
+            frames = tuple(project_frames)
             delta = reduce(
-                operator.add,
-                (f.stop - f.start for f in frames),
-                datetime.timedelta()
+                operator.add, (f.stop - f.start for f in frames), datetime.timedelta()
             )
             total += delta
 
             project_report = {
-                'name': project,
-                'time': delta.total_seconds(),
-                'tags': []
+                "name": project,
+                "time": delta.total_seconds(),
+                "tags": [],
             }
 
             if tags is None:
                 tags = []
 
             tags_to_print = sorted(
-                set(tag for frame in frames for tag in frame.tags
-                    if tag in tags or not tags)
+                {
+                    tag
+                    for frame in frames
+                    for tag in frame.tags
+                    if tag in tags or not tags
+                }
             )
 
             for tag in tags_to_print:
                 delta = reduce(
                     operator.add,
                     (f.stop - f.start for f in frames if tag in f.tags),
-                    datetime.timedelta()
+                    datetime.timedelta(),
                 )
 
-                project_report['tags'].append({
-                    'name': tag,
-                    'time': delta.total_seconds()
-                })
+                project_report["tags"].append(
+                    {"name": tag, "time": delta.total_seconds()}
+                )
 
-            report['projects'].append(project_report)
+            report["projects"].append(project_report)
 
-        report['time'] = total.total_seconds()
+        report["time"] = total.total_seconds()
         return report
 
     def rename_project(self, old_project, new_project):
@@ -559,8 +582,7 @@ class Watson(object):
         for frame in self.frames:
             if frame.project == old_project:
                 self.frames[frame.id] = frame._replace(
-                    project=new_project,
-                    updated_at=updated_at
+                    project=new_project, updated_at=updated_at
                 )
 
         self.frames.changed = True
@@ -577,7 +599,7 @@ class Watson(object):
             if old_tag in frame.tags:
                 self.frames[frame.id] = frame._replace(
                     tags=[new_tag if t == old_tag else t for t in frame.tags],
-                    updated_at=updated_at
+                    updated_at=updated_at,
                 )
 
         self.frames.changed = True

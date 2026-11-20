@@ -1,23 +1,26 @@
 """Provide fixtures for pytest-based unit tests."""
 
-from click.testing import CliRunner
 import pytest
+from click.testing import CliRunner
 
 from watson import Watson
 
 
 @pytest.fixture
 def config_dir(tmpdir):
-    return str(tmpdir.mkdir('config'))
+    """Temporary Watson configuration directory."""
+    return str(tmpdir.mkdir("config"))
 
 
 @pytest.fixture
 def watson(config_dir):
+    """Watson instance using a temporary configuration directory."""
     return Watson(config_dir=config_dir)
 
 
 @pytest.fixture
 def runner():
+    """Click CLI test runner."""
     return CliRunner()
 
 

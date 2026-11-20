@@ -1,4 +1,4 @@
-"""Unit test for the 'fullmoon' helper"""
+"""Unit test for the 'fullmoon' helper."""
 
 import arrow
 import pytest
@@ -7,6 +7,7 @@ from watson.fullmoon import get_last_full_moon
 
 
 def test_with_known_date():
+    """Test the last full moon for known dates."""
     aniceday = arrow.Arrow(2018, 7, 27, 10, 51)
     aniceday_lastMoon = arrow.Arrow(2018, 6, 28, 4, 55)
     aniceday_result = get_last_full_moon(aniceday)
@@ -18,6 +19,7 @@ def test_with_known_date():
 
 
 def test_invalid_ranges():
+    """Dates out of the supported range should raise an error."""
     fail = arrow.Arrow(1970, 1, 1)
     fail2 = arrow.Arrow(2100, 5, 5)
     with pytest.raises(ValueError):

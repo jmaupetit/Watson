@@ -1,15 +1,27 @@
+"""Watson frames: time slots spent on a project."""
+
 import uuid
+from collections import namedtuple
 
 import arrow
 from dateutil import tz
 
-from collections import namedtuple
-
-HEADERS = ('start', 'stop', 'project', 'id', 'tags', 'updated_at')
+HEADERS = ("start", "stop", "project", "id", "tags", "updated_at")
 
 
-class Frame(namedtuple('Frame', HEADERS)):
-    def __new__(cls, start, stop, project, id, tags=None, updated_at=None,):
+class Frame(namedtuple("Frame", HEADERS)):
+    """A time slot spent on a project with tags."""
+
+    def __new__(  # noqa: PLR0913, PLR0917
+        cls,
+        start,
+        stop,
+        project,
+        id,
+        tags=None,
+        updated_at=None,
+    ):
+        """Create a frame, converting dates to local arrow objects."""
         try:
             if not isinstance(start, arrow.Arrow):
                 start = arrow.get(start)
@@ -22,8 +34,9 @@ class Frame(namedtuple('Frame', HEADERS)):
             elif not isinstance(updated_at, arrow.Arrow):
                 updated_at = arrow.get(updated_at)
         except (ValueError, TypeError) as e:
-            from .watson import WatsonError
-            raise WatsonError("Error converting date: {}".format(e))
+            from .watson import WatsonError  # noqa: PLC0415 (circular import)
+
+            raise WatsonError("Error converting date: {}".format(e)) from e
 
         start = start.to(tz.tzlocal())
 
@@ -38,44 +51,58 @@ class Frame(namedtuple('Frame', HEADERS)):
         )
 
     def dump(self):
-        start = self.start.to('utc').int_timestamp
-        stop = self.stop.to('utc').int_timestamp if self.stop else None
+        """Serialize the frame as a tuple with UTC timestamps."""
+        start = self.start.to("utc").int_timestamp
+        stop = self.stop.to("utc").int_timestamp if self.stop else None
         updated_at = self.updated_at.int_timestamp
 
         return (start, stop, self.project, self.id, self.tags, updated_at)
 
     @property
     def day(self):
-        return self.start.floor('day')
+        """Frame start day."""
+        return self.start.floor("day")
 
     def __lt__(self, other):
+        """Compare frames by start date."""
         return self.start < other.start
 
     def __lte__(self, other):
+        """Compare frames by start date."""
         return self.start <= other.start
 
     def __gt__(self, other):
+        """Compare frames by start date."""
         return self.start > other.start
 
     def __gte__(self, other):
+        """Compare frames by start date."""
         return self.start >= other.start
 
 
 class Span(object):
-    def __init__(self, start, stop, timeframe='day'):
+    """A time span rounded to the given timeframe."""
+
+    def __init__(self, start, stop, timeframe="day"):
+        """Initialize the span from start to stop rounded to the timeframe."""
         self.timeframe = timeframe
         self.start = start.floor(self.timeframe)
         self.stop = stop.ceil(self.timeframe)
 
     def overlaps(self, frame):
+        """Check if the frame overlaps the span."""
         return frame.start <= self.stop and frame.stop >= self.start
 
     def __contains__(self, frame):
+        """Check if the frame is fully contained in the span."""
         return frame.start >= self.start and frame.stop <= self.stop
 
 
 class Frames(object):
+    """A collection of frames."""
+
     def __init__(self, frames=None):
+        """Initialize frames from a list of serialized frames."""
         if not frames:
             frames = []
 
@@ -85,9 +112,11 @@ class Frames(object):
         self.changed = False
 
     def __len__(self):
+        """Number of frames."""
         return len(self._rows)
 
     def __getitem__(self, key):
+        """Get a column by name, or a frame by position or id."""
         if key in HEADERS:
             return tuple(self._get_col(key))
         elif isinstance(key, int):
@@ -96,6 +125,7 @@ class Frames(object):
             return self._rows[self._get_index_by_id(key)]
 
     def __setitem__(self, key, value):
+        """Set a frame by position or id."""
         self.changed = True
 
         if isinstance(value, Frame):
@@ -113,6 +143,7 @@ class Frames(object):
                 self._rows.append(frame)
 
     def __delitem__(self, key):
+        """Delete a frame by position or id."""
         self.changed = True
 
         if isinstance(key, int):
@@ -122,11 +153,9 @@ class Frames(object):
 
     def _get_index_by_id(self, id):
         try:
-            return next(
-                i for i, v in enumerate(self['id']) if v.startswith(id)
-            )
+            return next(i for i, v in enumerate(self["id"]) if v.startswith(id))
         except StopIteration:
-            raise KeyError("Frame with id {} not found.".format(id))
+            raise KeyError("Frame with id {} not found.".format(id)) from None
 
     def _get_col(self, col):
         index = HEADERS.index(col)
@@ -134,22 +163,25 @@ class Frames(object):
             yield row[index]
 
     def add(self, *args, **kwargs):
+        """Create a new frame and add it to the collection."""
         self.changed = True
         frame = self.new_frame(*args, **kwargs)
         self._rows.append(frame)
         return frame
 
-    def new_frame(self, project, start, stop, tags=None, id=None,
-                  updated_at=None):
+    def new_frame(  # noqa: PLR0913, PLR0917
+        self, project, start, stop, tags=None, id=None, updated_at=None
+    ):
+        """Create a new frame (with a random id if not given)."""
         if not id:
             id = uuid.uuid4().hex
-        return Frame(start, stop, project, id, tags=tags,
-                     updated_at=updated_at)
+        return Frame(start, stop, project, id, tags=tags, updated_at=updated_at)
 
     def dump(self):
+        """Serialize all frames."""
         return tuple(frame.dump() for frame in self._rows)
 
-    def filter(
+    def filter(  # noqa: PLR0913, PLR0917
         self,
         projects=None,
         tags=None,
@@ -158,18 +190,18 @@ class Frames(object):
         span=None,
         include_partial_frames=False,
     ):
-
+        """Yield frames matching given filters."""
         for frame in self._rows:
             if projects is not None and frame.project not in projects:
                 continue
-            if ignore_projects is not None and\
-               frame.project in ignore_projects:
+            if ignore_projects is not None and frame.project in ignore_projects:
                 continue
 
             if tags is not None and not any(tag in frame.tags for tag in tags):
                 continue
-            if ignore_tags is not None and\
-               any(tag in frame.tags for tag in ignore_tags):
+            if ignore_tags is not None and any(
+                tag in frame.tags for tag in ignore_tags
+            ):
                 continue
 
             if span is None:
@@ -185,4 +217,5 @@ class Frames(object):
                 yield frame._replace(start=start, stop=stop)
 
     def span(self, start, stop):
+        """Create a time span."""
         return Span(start, stop)

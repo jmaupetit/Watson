@@ -1,3 +1,5 @@
+"""Watson shell autocompletion helpers."""
+
 from .utils import create_watson, parse_tags
 
 
@@ -9,10 +11,10 @@ def _bypass_click_bug_to_ensure_watson(ctx):
 
 
 def get_project_or_task_completion(ctx, args, incomplete):
-    """Function to autocomplete either organisations or tasks, depending on the
-       shape of the current argument."""
+    """Function to autocomplete either organisations or tasks.
 
-    assert isinstance(incomplete, str)
+    The completion depends on the shape of the current argument.
+    """
 
     def get_incomplete_tag(args, incomplete):
         """Get incomplete tag from command line string."""
@@ -21,8 +23,7 @@ def get_project_or_task_completion(ctx, args, incomplete):
         return found_tags[-1] if found_tags else ""
 
     def fix_broken_tag_parsing(incomplete_tag):
-        """
-        Remove spaces from parsed tag
+        """Remove spaces from parsed tag.
 
         The function `parse_tags` inserts a space after each character. In
         order to obtain the actual command line part, the space needs to be
@@ -31,8 +32,7 @@ def get_project_or_task_completion(ctx, args, incomplete):
         return "".join(char for char in incomplete_tag.split(" "))
 
     def prepend_plus(tag_suggestions):
-        """
-        Prepend '+' to each tag suggestion.
+        """Prepend '+' to each tag suggestion.
 
         For the `watson` targeted with the function
         get_project_or_task_completion, a leading plus in front of a tag is
@@ -47,9 +47,7 @@ def get_project_or_task_completion(ctx, args, incomplete):
 
     _bypass_click_bug_to_ensure_watson(ctx)
 
-    project_is_completed = any(
-        tok.startswith("+") for tok in args + [incomplete]
-    )
+    project_is_completed = any(tok.startswith("+") for tok in args + [incomplete])
     if project_is_completed:
         incomplete_tag = get_incomplete_tag(args, incomplete)
         fixed_incomplete_tag = fix_broken_tag_parsing(incomplete_tag)
@@ -68,8 +66,7 @@ def get_projects(ctx, args, incomplete):
 
 
 def get_rename_name(ctx, args, incomplete):
-    """
-    Function to return all projects or tasks matching the prefix
+    """Function to return all projects or tasks matching the prefix.
 
     Depending on the specified rename_type, either a list of projects or a list
     of tasks must be returned. This function takes care of this distinction and
@@ -78,7 +75,6 @@ def get_rename_name(ctx, args, incomplete):
     If the passed in type is unknown, e.g. due to a typo, an empty completion
     is generated.
     """
-
     in_type = ctx.params["rename_type"]
     if in_type == "project":
         return get_projects(ctx, args, incomplete)
@@ -104,8 +100,7 @@ def get_tags(ctx, args, incomplete):
 
 
 def get_frames(ctx, args, incomplete):
-    """
-    Return all matching frame IDs
+    """Return all matching frame IDs.
 
     This function returns all frame IDs that match the given prefix in a
     generator. If no ID matches the prefix, it returns the empty generator.

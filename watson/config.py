@@ -3,25 +3,26 @@
 import shlex
 from configparser import RawConfigParser
 
-__all__ = ('ConfigParser',)
+__all__ = ("ConfigParser",)
 
 
 class ConfigParser(RawConfigParser):
     """A simple wrapper for RawConfigParser to make options access easier."""
 
     def get(self, section, option, default=None, **kwargs):
-        """
-        Return value of option in given configuration section as a string.
+        """Return value of option in given configuration section as a string.
 
         If option is not set, return default instead (defaults to None).
 
         """
-        return (RawConfigParser.get(self, section, option, **kwargs)
-                if self.has_option(section, option) else default)
+        return (
+            RawConfigParser.get(self, section, option, **kwargs)
+            if self.has_option(section, option)
+            else default
+        )
 
     def getint(self, section, option, default=None):
-        """
-        Return value of option in given configuration section as an integer.
+        """Return value of option in given configuration section as an integer.
 
         If option is not set, return default (defaults to None).
 
@@ -32,8 +33,7 @@ class ConfigParser(RawConfigParser):
         return default if val is None else int(val)
 
     def getfloat(self, section, option, default=None):
-        """
-        Return value of option in given configuration section as a float.
+        """Return value of option in given configuration section as a float.
 
         If option is not set, return default (defaults to None).
 
@@ -44,8 +44,7 @@ class ConfigParser(RawConfigParser):
         return default if val is None else float(val)
 
     def getboolean(self, section, option, default=False):
-        """
-        Return value of option in given configuration section as a boolean.
+        """Return value of option in given configuration section as a boolean.
 
         A configuration option is considered true when it has one of the
         following values: '1', 'on', 'true' or 'yes'. The comparison is
@@ -55,11 +54,10 @@ class ConfigParser(RawConfigParser):
 
         """
         val = self.get(section, option)
-        return val.lower() in ('1', 'on', 'true', 'yes') if val else default
+        return val.lower() in ("1", "on", "true", "yes") if val else default
 
     def getlist(self, section, option, default=None):
-        """
-        Return value of option in given section as a list of strings.
+        """Return value of option in given section as a list of strings.
 
         If option is not set, return default (defaults to an empty list).
 
@@ -88,15 +86,13 @@ class ConfigParser(RawConfigParser):
 
         value = self.get(section, option)
 
-        if '\n' in value:
-            return [item.strip()
-                    for item in value.splitlines() if item.strip()]
+        if "\n" in value:
+            return [item.strip() for item in value.splitlines() if item.strip()]
         else:
             return shlex.split(value)
 
     def set(self, section, option, value):
-        """
-        Set option in given configuration section to value.
+        """Set option in given configuration section to value.
 
         If section does not exist yet, it is added implicitly.
 

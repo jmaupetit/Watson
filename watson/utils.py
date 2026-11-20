@@ -1,3 +1,5 @@
+"""Watson utilities."""
+
 import collections as co
 import csv
 import datetime
@@ -8,67 +10,84 @@ import os
 import shutil
 import tempfile
 from io import StringIO
-import click
+
 import arrow
+import click
+from click.exceptions import UsageError
 
 import watson as _watson
+
 from .fullmoon import get_last_full_moon
 
-from click.exceptions import UsageError
+SECONDS_PER_MINUTE = 60
+SECONDS_PER_HOUR = 60 * SECONDS_PER_MINUTE
 
 
 def create_watson():
-    return _watson.Watson(config_dir=os.environ.get('WATSON_DIR'))
+    """Create a Watson instance using the WATSON_DIR configuration directory."""
+    return _watson.Watson(config_dir=os.environ.get("WATSON_DIR"))
 
 
 def confirm_project(project, watson_projects):
-    """
-    Ask user to confirm creation of a new project
-    'project' must be a string
-    'watson_projects' must be an interable.
-    Returns True on accept and raises click.exceptions.Abort on reject
+    """Ask user to confirm creation of a new project.
+
+    Args:
+        project: the project name.
+        watson_projects: an iterable of existing projects.
+
+    Returns:
+        True on accept.
+
+    Raises:
+        click.exceptions.Abort: on reject.
     """
     if project not in watson_projects:
-        msg = ("Project '%s' does not exist yet. Create it?"
-               % style('project', project))
+        msg = "Project '%s' does not exist yet. Create it?" % style("project", project)
         click.confirm(msg, abort=True)
     return True
 
 
 def confirm_tags(tags, watson_tags):
-    """
-    Ask user to confirm creation of new tags (each separately)
-    Both 'tags' and 'watson_tags" must be iterables.
-    Returns True if all accepted and raises click.exceptions.Abort on reject
+    """Ask user to confirm creation of new tags (each separately).
+
+    Args:
+        tags: an iterable of tags.
+        watson_tags: an iterable of existing tags.
+
+    Returns:
+        True if all accepted.
+
+    Raises:
+        click.exceptions.Abort: on reject.
     """
     for tag in tags:
         if tag not in watson_tags:
-            msg = "Tag '%s' does not exist yet. Create it?" % style('tag', tag)
+            msg = "Tag '%s' does not exist yet. Create it?" % style("tag", tag)
             click.confirm(msg, abort=True)
     return True
 
 
 def style(name, element):
+    """Style the given element according to its type `name`."""
+
     def _style_tags(tags):
         if not tags:
-            return ''
+            return ""
 
-        return '[{}]'.format(', '.join(
-            style('tag', tag) for tag in tags
-        ))
+        return "[{}]".format(", ".join(style("tag", tag) for tag in tags))
 
     def _style_short_id(id):
-        return style('id', id[:7])
+        return style("id", id[:7])
 
     formats = {
-        'project': {'fg': 'magenta'},
-        'tags': _style_tags,
-        'tag': {'fg': 'blue'},
-        'time': {'fg': 'green'},
-        'error': {'fg': 'red'},
-        'date': {'fg': 'cyan'},
-        'short_id': _style_short_id,
-        'id': {'fg': 'white'}
+        "project": {"fg": "magenta"},
+        "tags": _style_tags,
+        "tag": {"fg": "blue"},
+        "time": {"fg": "green"},
+        "error": {"fg": "red"},
+        "date": {"fg": "cyan"},
+        "short_id": _style_short_id,
+        "id": {"fg": "white"},
     }
 
     fmt = formats.get(name, {})
@@ -81,56 +100,57 @@ def style(name, element):
 
 
 def format_timedelta(delta):
-    """
-    Return a string roughly representing a timedelta.
-    """
+    """Return a string roughly representing a timedelta."""
     seconds = int(delta.total_seconds())
     neg = seconds < 0
     seconds = abs(seconds)
     total = seconds
     stems = []
 
-    if total >= 3600:
-        hours = seconds // 3600
-        stems.append('{}h'.format(hours))
-        seconds -= hours * 3600
+    if total >= SECONDS_PER_HOUR:
+        hours = seconds // SECONDS_PER_HOUR
+        stems.append("{}h".format(hours))
+        seconds -= hours * SECONDS_PER_HOUR
 
-    if total >= 60:
-        mins = seconds // 60
-        stems.append('{:02}m'.format(mins))
-        seconds -= mins * 60
+    if total >= SECONDS_PER_MINUTE:
+        mins = seconds // SECONDS_PER_MINUTE
+        stems.append("{:02}m".format(mins))
+        seconds -= mins * SECONDS_PER_MINUTE
 
-    stems.append('{:02}s'.format(seconds))
+    stems.append("{:02}s".format(seconds))
 
-    return ('-' if neg else '') + ' '.join(stems)
+    return ("-" if neg else "") + " ".join(stems)
 
 
 def sorted_groupby(iterator, key, reverse=False):
-    """
-    Similar to `itertools.groupby`, but sorts the iterator with the same
-    key first.
-    """
+    """Similar to `itertools.groupby`, but sorts the iterator by key first."""
     return itertools.groupby(sorted(iterator, key=key, reverse=reverse), key)
 
 
 def options(opt_list):
+    """Wrapper for the `value_proc` field in `click.prompt`.
+
+    It validates that the user response is part of the list of accepted
+    responses.
     """
-    Wrapper for the `value_proc` field in `click.prompt`, which validates
-    that the user response is part of the list of accepted responses.
-    """
+
     def value_proc(user_input):
         if user_input in opt_list:
             return user_input
         else:
-            raise UsageError("Response should be one of [{}]".format(
-                ','.join(str(x) for x in opt_list)))
+            raise UsageError(
+                "Response should be one of [{}]".format(
+                    ",".join(str(x) for x in opt_list)
+                )
+            )
+
     return value_proc
 
 
 def get_frame_from_argument(watson, arg):
-    """
-    Get a frame from a command line argument which can either be a
-    position index (-1) or a frame id.
+    """Get a frame from a command line argument.
+
+    The argument can either be a position index (-1) or a frame id.
     """
     # first we try to see if we are refering to a frame by
     # its position (for example -2). We only take negative indexes
@@ -141,8 +161,8 @@ def get_frame_from_argument(watson, arg):
             return watson.frames[index]
     except IndexError:
         raise click.ClickException(
-            style('error', "No frame found for index {}.".format(arg))
-        )
+            style("error", "No frame found for index {}.".format(arg))
+        ) from None
     except (ValueError, TypeError):
         pass
 
@@ -150,13 +170,15 @@ def get_frame_from_argument(watson, arg):
     try:
         return watson.frames[arg]
     except KeyError:
-        raise click.ClickException("{} {}.".format(
-            style('error', "No frame found with id"),
-            style('short_id', arg))
-        )
+        raise click.ClickException(
+            "{} {}.".format(
+                style("error", "No frame found with id"), style("short_id", arg)
+            )
+        ) from None
 
 
 def get_start_time_for_period(period):
+    """Get the start time of the current given period."""
     # Using now() from datetime instead of arrow for mocking compatibility.
     now = arrow.Arrow.fromdatetime(datetime.datetime.now())
     date = now.date()
@@ -167,33 +189,46 @@ def get_start_time_for_period(period):
 
     weekday = now.weekday()
 
-    if period == 'day':
+    if period == "day":
         start_time = arrow.Arrow(year, month, day)
-    elif period == 'week':
+    elif period == "week":
         start_time = arrow.Arrow.fromdate(now.shift(days=-weekday).date())
-    elif period == 'month':
+    elif period == "month":
         start_time = arrow.Arrow(year, month, 1)
-    elif period == 'luna':
+    elif period == "luna":
         start_time = get_last_full_moon(now)
-    elif period == 'year':
+    elif period == "year":
         start_time = arrow.Arrow(year, 1, 1)
-    elif period == 'all':
+    elif period == "all":
         # approximately timestamp `0`
         start_time = arrow.Arrow(1970, 1, 1)
     else:
-        raise ValueError('Unsupported period value: {}'.format(period))
+        raise ValueError("Unsupported period value: {}".format(period))
 
     return start_time
 
 
 def apply_weekday_offset(start_time, week_start):
+    """Apply the offset required to move the start date of a week.
+
+    Move the start date `start_time` of a week starting on Monday to that of a
+    week starting on `week_start`.
     """
-    Apply the offset required to move the start date `start_time` of a week
-    starting on Monday to that of a week starting on `week_start`.
-    """
-    weekdays = dict(zip(
-        ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday",
-         "sunday"], range(0, 7)))
+    weekdays = dict(
+        zip(
+            [
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday",
+            ],
+            range(0, 7),
+            strict=True,
+        )
+    )
 
     new_start = week_start.lower()
     if new_start not in weekdays:
@@ -204,19 +239,21 @@ def apply_weekday_offset(start_time, week_start):
 
 
 def make_json_writer(func, *args, **kwargs):
-    """
-    Return a function that receives a file-like object and writes the return
+    """Return a function that writes `func` result as JSON to a file.
+
+    The returned function receives a file-like object and writes the return
     value of func(*args, **kwargs) as JSON to it.
     """
+
     def writer(f):
         dump = json.dumps(func(*args, **kwargs), indent=1, ensure_ascii=False)
         f.write(dump)
+
     return writer
 
 
-def safe_save(path, content, ext='.bak'):
-    """
-    Save given content to file at given path safely.
+def safe_save(path, content, ext=".bak"):
+    """Save given content to file at given path safely.
 
     `content` may either be a (unicode) string to write to the file, or a
     function taking one argument, a file object opened for writing. The
@@ -230,7 +267,7 @@ def safe_save(path, content, ext='.bak'):
     the temporary file moved into its place.
 
     """
-    tmpfp = tempfile.NamedTemporaryFile(mode='w+', delete=False)
+    tmpfp = tempfile.NamedTemporaryFile(mode="w+", delete=False)
     try:
         with tmpfp:
             if isinstance(content, str):
@@ -255,36 +292,48 @@ def safe_save(path, content, ext='.bak'):
 
 
 def deduplicate(sequence):
-    """
-    Return a list with all items of the input sequence but duplicates removed.
+    """Return a list with all items of the input sequence but duplicates removed.
 
     Leaves the input sequence unaltered.
     """
-    return [element
-            for index, element in enumerate(sequence)
-            if element not in sequence[:index]]
+    return [
+        element
+        for index, element in enumerate(sequence)
+        if element not in sequence[:index]
+    ]
 
 
 def parse_tags(values_list):
-    """
-    Return a list of tags parsed from the input values list.
+    """Return a list of tags parsed from the input values list.
 
     Find all the tags starting by a '+', even if there are spaces in them,
     then strip each tag and filter out the empty ones
     """
-    return list(filter(None, map(operator.methodcaller('strip'), (
-        # We concatenate the word with the '+' to the following words
-        # not starting with a '+'
-        w[1:] + ' ' + ' '.join(itertools.takewhile(
-            lambda s: not s.startswith('+'), values_list[i + 1:]
-        ))
-        for i, w in enumerate(values_list) if w.startswith('+')
-    ))))  # pile of pancakes !
+    return list(
+        filter(
+            None,
+            map(
+                operator.methodcaller("strip"),
+                (
+                    # We concatenate the word with the '+' to the following words
+                    # not starting with a '+'
+                    w[1:]
+                    + " "
+                    + " ".join(
+                        itertools.takewhile(
+                            lambda s: not s.startswith("+"), values_list[i + 1 :]
+                        )
+                    )
+                    for i, w in enumerate(values_list)
+                    if w.startswith("+")
+                ),
+            ),
+        )
+    )  # pile of pancakes !
 
 
 def frames_to_json(frames):
-    """
-    Transform a sequence of frames into a JSON-formatted string.
+    """Transform a sequence of frames into a JSON-formatted string.
 
     Each frame object has an equivalent pair name/value in the JSON string,
     except for 'updated_at', which is not included.
@@ -292,21 +341,22 @@ def frames_to_json(frames):
     .. seealso:: :class:`Frame`
     """
     log = [
-        co.OrderedDict([
-            ('id', frame.id),
-            ('start', frame.start.isoformat()),
-            ('stop', frame.stop.isoformat()),
-            ('project', frame.project),
-            ('tags', frame.tags),
-        ])
+        co.OrderedDict(
+            [
+                ("id", frame.id),
+                ("start", frame.start.isoformat()),
+                ("stop", frame.stop.isoformat()),
+                ("project", frame.project),
+                ("tags", frame.tags),
+            ]
+        )
         for frame in frames
     ]
     return json.dumps(log, indent=4, sort_keys=True)
 
 
 def frames_to_csv(frames):
-    """
-    Transform a sequence of frames into a CSV-formatted string.
+    """Transform a sequence of frames into a CSV-formatted string.
 
     Each frame object has an equivalent pair name/value in the CSV string,
     except for 'updated_at', which is not included.
@@ -314,21 +364,22 @@ def frames_to_csv(frames):
     .. seealso:: :class:`Frame`
     """
     entries = [
-        co.OrderedDict([
-            ('id', frame.id[:7]),
-            ('start', frame.start.format('YYYY-MM-DD HH:mm:ss')),
-            ('stop', frame.stop.format('YYYY-MM-DD HH:mm:ss')),
-            ('project', frame.project),
-            ('tags', ', '.join(frame.tags)),
-        ])
+        co.OrderedDict(
+            [
+                ("id", frame.id[:7]),
+                ("start", frame.start.format("YYYY-MM-DD HH:mm:ss")),
+                ("stop", frame.stop.format("YYYY-MM-DD HH:mm:ss")),
+                ("project", frame.project),
+                ("tags", ", ".join(frame.tags)),
+            ]
+        )
         for frame in frames
     ]
     return build_csv(entries)
 
 
 def build_csv(entries):
-    """
-    Creates a CSV string from a list of dict objects.
+    """Creates a CSV string from a list of dict objects.
 
     The dictionary keys of the first item in the list are used as the header
     row for the built CSV. All item's keys are supposed to be identical.
@@ -336,7 +387,7 @@ def build_csv(entries):
     if entries:
         header = entries[0].keys()
     else:
-        return ''
+        return ""
     memfile = StringIO()
     writer = csv.DictWriter(memfile, header, lineterminator=os.linesep)
     writer.writeheader()
@@ -347,8 +398,7 @@ def build_csv(entries):
 
 
 def flatten_report_for_csv(report):
-    """
-    Flattens the data structure returned by `watson.report()` for a csv export.
+    """Flattens the data structure returned by `watson.report()` for a csv export.
 
     Dates are formatted in a way that Excel (default csv module dialect) can
     handle them (i.e. YYYY-MM-DD HH:mm:ss).
@@ -366,35 +416,45 @@ def flatten_report_for_csv(report):
     of the report.
     """
     result = []
-    datetime_from = report['timespan']['from'].format('YYYY-MM-DD HH:mm:ss')
-    datetime_to = report['timespan']['to'].format('YYYY-MM-DD HH:mm:ss')
-    for project in report['projects']:
-        result.append({
-            'from': datetime_from,
-            'to': datetime_to,
-            'project': project['name'],
-            'tag': '',
-            'time': project['time']
-        })
-        for tag in project['tags']:
-            result.append({
-                'from': datetime_from,
-                'to': datetime_to,
-                'project': project['name'],
-                'tag': tag['name'],
-                'time': tag['time']
-            })
+    datetime_from = report["timespan"]["from"].format("YYYY-MM-DD HH:mm:ss")
+    datetime_to = report["timespan"]["to"].format("YYYY-MM-DD HH:mm:ss")
+    for project in report["projects"]:
+        result.append(
+            {
+                "from": datetime_from,
+                "to": datetime_to,
+                "project": project["name"],
+                "tag": "",
+                "time": project["time"],
+            }
+        )
+        for tag in project["tags"]:
+            result.append(
+                {
+                    "from": datetime_from,
+                    "to": datetime_to,
+                    "project": project["name"],
+                    "tag": tag["name"],
+                    "time": tag["time"],
+                }
+            )
     return result
 
 
 def json_arrow_encoder(obj):
-    """
-    Encodes Arrow objects for JSON output.
+    """Encodes Arrow objects for JSON output.
+
     This function can be used with
     `json.dumps(..., default=json_arrow_encoder)`, for example.
-    If the object is not an Arrow type, a TypeError is raised
-    :param obj: Object to encode
-    :return: JSON representation of Arrow object as defined by Arrow
+
+    Args:
+        obj: Object to encode.
+
+    Returns:
+        JSON representation of Arrow object as defined by Arrow.
+
+    Raises:
+        TypeError: If the object is not an Arrow type.
     """
     if isinstance(obj, arrow.Arrow):
         return obj.for_json()

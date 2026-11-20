@@ -24,6 +24,33 @@ docs-publish: ## publish documentation
 	uv run mkdocs gh-deploy --force
 .PHONY: docs-publish
 
+# -- Quality
+lint: ## lint all sources
+lint: \
+  lint-format \
+  lint-ruff
+.PHONY: lint
+
+lint-format: ## format python sources with ruff format
+	@echo 'lint:format started…'
+	uv run ruff format watson tests scripts
+.PHONY: lint-format
+
+lint-format-check: ## check python sources formatting with ruff format
+	@echo 'lint:format check started…'
+	uv run ruff format --check watson tests scripts
+.PHONY: lint-format-check
+
+lint-ruff: ## lint python sources with ruff
+	@echo 'lint:ruff started…'
+	uv run ruff check watson tests scripts
+.PHONY: lint-ruff
+
+lint-ruff-fix: ## lint and fix python sources with ruff
+	@echo 'lint:ruff-fix started…'
+	uv run ruff check --fix watson tests scripts
+.PHONY: lint-ruff-fix
+
 test: ## run tests
 	uv run pytest --cov --cov-report=term-missing --cov-report=html
 .PHONY: test

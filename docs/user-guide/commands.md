@@ -124,8 +124,9 @@ Flag | Help
 Usage:  watson cancel [OPTIONS]
 ```
 
-Cancel the last call to the start command. The time will
-not be recorded.
+Cancel the last call to the start command.
+
+The time will not be recorded.
 
 ### Options
 
@@ -216,7 +217,7 @@ Flag | Help
 Usage:  watson help [OPTIONS] [COMMAND]
 ```
 
-Display help information
+Display help information.
 
 ### Options
 
@@ -412,8 +413,10 @@ Flag | Help
 Usage:  watson remove [OPTIONS] ID
 ```
 
-Remove a frame. You can specify the frame either by id or by position
-(ex: `-1` for the last frame).
+Remove a frame.
+
+You can specify the frame either by id or by position (ex: `-1` for the last
+frame).
 
 ### Options
 
@@ -628,6 +631,7 @@ Usage:  watson start [OPTIONS] [ARGS]...
 ```
 
 Start monitoring time for the given project.
+
 You can add tags indicating more specifically what you are working on with
 `+tag`.
 
@@ -714,7 +718,7 @@ Example:
 
 
     $ watson stop --at 13:37
-    Stopping project apollo11, started an hour ago and stopped 30 minutes ago. (id: e9ccd52) # noqa: E501
+    Stopping project apollo11, started an hour ago and stopped 30 minutes ago. (id: e9ccd52)
 
 ### Options
 
