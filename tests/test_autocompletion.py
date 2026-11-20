@@ -16,7 +16,6 @@ from watson.autocompletion import (
 
 from . import TEST_FIXTURE_DIR
 
-
 AUTOCOMPLETION_FRAMES_PATH = TEST_FIXTURE_DIR / "autocompletion"
 with open(str(AUTOCOMPLETION_FRAMES_PATH / "frames")) as fh:
     N_FRAMES = len(json.load(fh))
@@ -42,9 +41,8 @@ ClickContext = Namespace
         (get_tags, None, []),
     ],
 )
-def test_if_returned_values_are_distinct(
-    watson_df, func_to_test, rename_type, args
-):
+def test_if_returned_values_are_distinct(watson_df, func_to_test, rename_type, args):
+    """Completion functions should not return duplicates."""
     ctx = ClickContext(obj=watson_df, params={"rename_type": rename_type})
     prefix = ""
     ret_list = list(func_to_test(ctx, args, prefix))
@@ -68,6 +66,7 @@ def test_if_returned_values_are_distinct(
 def test_if_empty_prefix_returns_everything(
     watson_df, func_to_test, n_expected_returns, rename_type, args
 ):
+    """An empty prefix should complete to all values."""
     prefix = ""
     ctx = ClickContext(obj=watson_df, params={"rename_type": rename_type})
     completed_vals = set(func_to_test(ctx, args, prefix))
@@ -89,9 +88,8 @@ def test_if_empty_prefix_returns_everything(
         (get_tags, None, []),
     ],
 )
-def test_completion_of_nonexisting_prefix(
-    watson_df, func_to_test, rename_type, args
-):
+def test_completion_of_nonexisting_prefix(watson_df, func_to_test, rename_type, args):
+    """An unknown prefix should complete to nothing."""
     ctx = ClickContext(obj=watson_df, params={"rename_type": rename_type})
     prefix = "NOT-EXISTING-PREFIX"
     ret_list = list(func_to_test(ctx, args, prefix))
@@ -125,9 +123,10 @@ def test_completion_of_nonexisting_prefix(
         (get_tags, "tag", N_TASKS, None, []),
     ],
 )
-def test_completion_of_existing_prefix(
+def test_completion_of_existing_prefix(  # noqa: PLR0913, PLR0917
     watson_df, func_to_test, prefix, n_expected_vals, rename_type, args
 ):
+    """An existing prefix should complete to matching values."""
     ctx = ClickContext(obj=watson_df, params={"rename_type": rename_type})
     ret_set = set(func_to_test(ctx, args, prefix))
     assert len(ret_set) == n_expected_vals
@@ -144,5 +143,6 @@ def test_completion_of_existing_prefix(
     ],
 )
 def test_for_known_completion_values(func_to_test, prefix, expected_vals):
+    """Completion should return the expected values."""
     ret_list = list(func_to_test(None, [], prefix))
     assert ret_list == expected_vals

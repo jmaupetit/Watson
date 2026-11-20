@@ -109,8 +109,18 @@ select = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
+"scripts/fuzzer.py" = [
+    "S311",  # pseudo-random generators are fine to generate fake data
+]
 "tests/*" = [
-    "S101", # use of assert
+    "PLR2004",  # magic value comparison
+    "S101",  # use of assert
+]
+"watson/cli.py" = [
+    "D301",  # click relies on "\b" escape sequences in docstrings
+    "D412",  # click needs a blank line before "\b" blocks in docstrings
+    "PLR0913",  # click commands have many options
+    "PLR0917",  # click commands have many options
 ]
 
 [tool.ruff.lint.pydocstyle]

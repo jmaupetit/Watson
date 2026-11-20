@@ -22,11 +22,15 @@ and this project adheres to
 ### Changed
 
 - Add current maintainer to the license copyright notice
+- Format and lint all sources with ruff
+- Set a 30 seconds timeout for backend synchronization requests
 
 ### Fixed
 
 - Wrong local time offset for dates in a different DST period than now
   (arrow 1.4+)
+- Command examples in help messages being re-wrapped by click
+- Leaked `# noqa` comment in the `stop` command help message
 
 ### Removed
 
