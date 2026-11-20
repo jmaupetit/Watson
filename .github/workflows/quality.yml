@@ -30,6 +30,21 @@ jobs:
       - name: Install the project
         run: make build
 
+  lint:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Install uv
+        uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
+        with:
+          enable-cache: true
+      - name: Lint with Ruff format
+        run: make lint-format-check
+      - name: Lint with Ruff
+        run: make lint-ruff
+
   test:
     needs: build
     runs-on: ubuntu-latest

@@ -16,6 +16,8 @@ and this project adheres to
   - documentation deployment
   - PyPI package publication
   - chore checks (fixup commits, CHANGELOG)
+  - lint (ruff format and check)
+- Ruff linter and formatter with `make lint*` rules
 
 ### Changed
 
