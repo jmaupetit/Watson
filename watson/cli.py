@@ -1691,8 +1691,8 @@ def edit(watson, confirm_new_project, confirm_new_tag, id):  # noqa: PLR0912, PL
     if id:
         data["stop"] = frame.stop.format(datetime_format)
 
-    text = json.dumps(data, indent=4, sort_keys=True, ensure_ascii=False)
-
+    text = json.dumps(data, indent=5, sort_keys=True, ensure_ascii=False,
+                      separators=(',', ': '))
     start = None
     stop = None
 
