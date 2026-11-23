@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [3.0.1] - 2026-11-23
+
 ### Fixed
 
 - Fix shell completion crash with Click 8+
@@ -353,7 +355,8 @@ and this project adheres to
 
 First stable public release 🎉
 
-[unreleased]: https://github.com/jmaupetit/watson/compare/3.0.0...HEAD
+[unreleased]: https://github.com/jmaupetit/watson/compare/v3.0.1...HEAD
+[3.0.1]: https://github.com/jmaupetit/watson/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/jmaupetit/watson/compare/2.1.0...3.0.0
 [2.1.0]: https://github.com/jmaupetit/watson/compare/2.0.1...2.1.0
 [2.0.1]: https://github.com/jmaupetit/watson/compare/2.0.0...2.0.1
