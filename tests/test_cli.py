@@ -3,6 +3,7 @@
 import re
 from datetime import datetime, timedelta
 from itertools import combinations
+from zoneinfo import ZoneInfo
 
 import arrow
 import pytest
@@ -128,6 +129,47 @@ def test_aggregate_invalid_date(runner, watson, test_dt):
     # This is super fast, because no internal 'report' invocations are made
     result = runner.invoke(cli.aggregate, ["-f", test_dt, "-t", test_dt], obj=watson)
     assert result.exit_code != 0
+
+
+@pytest.mark.parametrize(
+    ("from_dt", "to_dt"),
+    [
+        # Spring-forward DST (2022-03-27 in Europe/Berlin)
+        ("2022-03-21", "2022-03-28"),
+        ("2022-03-21 16:16:00", "2022-03-28 16:16:00"),
+        # Fall-back DST (2022-10-30 in Europe/Berlin)
+        ("2022-10-24", "2022-10-31"),
+        ("2022-10-24 16:16:00", "2022-10-31 16:16:00"),
+        # Normal week, including later start time than end time
+        ("2022-04-04", "2022-04-11"),
+        ("2022-04-04 18:00:00", "2022-04-11 08:00:00"),
+    ],
+)
+def test_aggregate_includes_final_day_across_dst(
+    runner, watson, mocker, from_dt, to_dt
+):
+    """The aggregate command should include all calendar days across DST transitions."""
+    # Return distinct tzinfo objects per call, matching tz.gettz(None) behavior.
+    mocker.patch(
+        "watson.cli.local_tz_info",
+        side_effect=lambda: ZoneInfo.no_cache("Europe/Berlin"),
+    )
+    berlin = ZoneInfo("Europe/Berlin")
+    start = arrow.get(from_dt).replace(tzinfo=berlin)
+    end = arrow.get(to_dt).replace(tzinfo=berlin)
+    frame_start = end.replace(hour=16, minute=16, second=0)
+    watson.frames.add("github", frame_start, frame_start.shift(minutes=5), ["bug"])
+
+    result = runner.invoke(
+        cli.aggregate, ["-G", "-f", from_dt, "-t", to_dt], obj=watson
+    )
+
+    assert result.exit_code == 0, result.output
+    for i in range((end.date() - start.date()).days + 1):
+        day_label = start.shift(days=i).format("ddd DD MMMM YYYY")
+        assert day_label in result.output
+    assert f"{end.format('ddd DD MMMM YYYY')} - 05m 00s" in result.output
+    assert "github - 05m 00s" in result.output
 
 
 # watson log
