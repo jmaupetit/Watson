@@ -1098,12 +1098,11 @@ def aggregate(ctx, watson, current, from_, to, projects, tags, output_format, pa
     2018-11-21 00:00:00,2018-11-21 23:59:59,watson,,77.0
     2018-11-21 00:00:00,2018-11-21 23:59:59,watson,docs,77.0
     """
-    delta = (to - from_).days
+    delta = (to.date() - from_.date()).days
     lines = []
 
     for i in range(delta + 1):
-        offset = datetime.timedelta(days=i)
-        from_offset = from_ + offset
+        from_offset = from_.shift(days=i)
         output = ctx.invoke(
             report,
             current=current,

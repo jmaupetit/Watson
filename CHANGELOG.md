@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix `aggregate` dropping the final day across DST transitions (#466)
+
 ## [3.0.1] - 2026-11-23
 
 ### Fixed
