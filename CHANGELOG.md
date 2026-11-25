@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix broken "Edit on GitHub" documentation links by setting `edit_uri` to
+  point to the `main` branch
+
 ## [3.0.1] - 2026-11-23
 
 ### Fixed
