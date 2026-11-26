@@ -11,6 +11,7 @@ and this project adheres to
 ### Fixed
 
 - Remove broken "Edit on GitHub" links from the documentation (#548)
+- Sync release notes documentation page with the CHANGELOG (symlink)
 
 ## [3.0.1] - 2026-11-23
 

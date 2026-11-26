@@ -23,7 +23,6 @@ Then edit the following files to describe changes:
 
 * `CHANGELOG.md`: move the `Unreleased` entries to a new dated section and
   update the compare links at the bottom of the file
-* `docs/about/release-notes.md`: copy/paste release notes here
 * `watson.completion` and `watson.zsh-completion`: generate up-to-date
   completion scripts by running `make completion-scripts`
 
@@ -32,7 +31,7 @@ your branch to GitHub:
 
 ```bash
 $ git add pyproject.toml uv.lock CHANGELOG.md \
-  docs/about/release-notes.md watson.completion watson.zsh-completion
+  watson.completion watson.zsh-completion
 $ git commit -m '🔖(minor) bump release to x.y.z'  # or (patch), (major)
 $ git push origin prepare-x.y.z
 ```
