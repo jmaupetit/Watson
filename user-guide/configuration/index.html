@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="TailorDev">
+        
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Configuration - Watson</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/docco.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="../../css/watson.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">Watson</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown"  aria-expanded="false">User Guide</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../commands/" class="dropdown-item">Commands</a>
+</li>
+                                    
+<li>
+    <a href="./" class="dropdown-item active" aria-current="page">Configuration</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Contributing</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../contributing/how-to/" class="dropdown-item">How to</a>
+</li>
+                                    
+<li>
+    <a href="../../contributing/hack/" class="dropdown-item">Hack</a>
+</li>
+                                    
+<li>
+    <a href="../../contributing/pr-guidelines/" class="dropdown-item">Pull Request guidelines</a>
+</li>
+                                    
+<li>
+    <a href="../../contributing/coc/" class="dropdown-item">Code of Conduct</a>
+</li>
+                                    
+<li>
+    <a href="../../contributing/release-new-version/" class="dropdown-item">Release a new version</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../faq/" class="nav-link">FAQ</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">About</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../about/license/" class="dropdown-item">License</a>
+</li>
+                                    
+<li>
+    <a href="../../about/release-notes/" class="dropdown-item">Release notes</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../commands/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../../contributing/how-to/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="https://github.com/jmaupetit/Watson" class="nav-link"><i class="fa-brands fa-github"></i> GitHub</a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#configuration" class="nav-link">Configuration</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#the-configuration-file" class="nav-link">The configuration file</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#editing" class="nav-link">Editing</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#available-settings" class="nav-link">Available settings</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#sample-configuration-file" class="nav-link">Sample configuration file</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#application-folder" class="nav-link">Application folder</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="configuration">Configuration</h1>
+<h2 id="the-configuration-file">The configuration file</h2>
+<p>Watson configuration and data are stored inside your user&rsquo;s application folder.
+Depending on your system, the default path is likely:</p>
+<ul>
+<li><strong>macOS</strong>: <code>~/Library/Application Support/watson/config</code></li>
+<li><strong>Windows</strong>: <code>%appdata%\watson\config</code>, which usually expands to
+    <code>C:\Users\&lt;user&gt;\AppData\Roaming\watson\config</code></li>
+<li><strong>Linux</strong>: <code>~/.config/watson/config</code></li>
+</ul>
+<p>The configuration file is a typical
+<a href="https://docs.python.org/3/library/configparser.html#supported-ini-file-structure">Python configuration (INI) file</a>,
+that looks like:</p>
+<pre><code class="language-ini">[Simple Values]
+key=value
+spaces in keys=allowed
+spaces in values=allowed as well
+spaces around the delimiter = obviously
+you can also use : to delimit keys from values
+
+[All Values Are Strings]
+values like this: 1000000
+or this: 3.14159265359
+are they treated as numbers? : no
+integers, floats and booleans are held as: strings
+can use the API to get converted values directly: true
+
+[Multiline Values]
+chorus: I'm a lumberjack, and I'm okay
+    I sleep all night and I work all day
+
+
+[No Values]
+key_without_value
+empty string value here =
+
+[You can use comments]
+# like this
+; or this
+
+# By default only in an empty line.
+# Inline comments can be harmful because they prevent users
+# from using the delimiting characters as parts of values.
+# That being said, this can be customized.
+
+    [Sections Can Be Indented]
+        can_values_be_as_well = True
+        does_that_mean_anything_special = False
+        purpose = formatting for readability
+        multiline_values = are
+            handled just fine as
+            long as they are indented
+            deeper than the first line
+            of a value
+        # Did I mention we can indent comments, too?
+</code></pre>
+<p><em>This example configuration file has been taken from the
+<a href="https://docs.python.org/3/library/configparser.html#supported-ini-file-structure">official Python documentation</a>.</em></p>
+<h2 id="editing">Editing</h2>
+<p>If you want to edit your configuration, the best is to use the
+<a href="../commands/#config"><code>config</code></a> command.</p>
+<p>You can edit your configuration on the fly with:</p>
+<pre><code class="language-bash">$ watson config SECTION.KEY VALUE
+</code></pre>
+<p>Example:</p>
+<pre><code class="language-bash">$ watson config backend.token 7e329263e329  # set configuration
+$ watson config backend.token  # display configuration
+7e329263e329
+</code></pre>
+<p>Or open an editor with:</p>
+<pre><code class="language-bash">$ watson config -e
+</code></pre>
+<h2 id="available-settings">Available settings</h2>
+<h3 id="backend">Backend</h3>
+<p>Watson has no official hosted backend. You can synchronize your frames with your
+own server, such as <a href="https://github.com/TailorDev/crick">crick</a>, via the
+<a href="../commands/#sync"><code>sync</code></a> command. To configure it, set up the <code>[backend]</code>
+section.</p>
+<h4 id="backendurl-default-empty"><code>backend.url</code> (default: empty)</h4>
+<p>This is the API root URL of your server, e.g. <code>https://my.server.com/api/</code></p>
+<h4 id="backendtoken-default-empty"><code>backend.token</code> (default: empty)</h4>
+<p>The API token used to authenticate Watson as a client of your server, e.g.
+<code>7e329263e329</code>.</p>
+<h3 id="options">Options</h3>
+<h4 id="optionsconfirm_new_project-default-false"><code>options.confirm_new_project</code> (default: <code>false</code>)</h4>
+<p>If <code>true</code>, the user will be asked for confirmation before creating a new
+project. When this option is <code>false</code>, you can still ask for confirmation on a
+single command with the <code>--confirm-new-project</code> flag.</p>
+<h4 id="optionsconfirm_new_tag-default-false"><code>options.confirm_new_tag</code> (default: <code>false</code>)</h4>
+<p>If <code>true</code>, the user will be asked for confirmation before creating a new tag.
+When this option is <code>false</code>, you can still ask for confirmation on a single
+command with the <code>--confirm-new-tag</code> flag.</p>
+<h4 id="optionsdate_format-default-ymd"><code>options.date_format</code> (default: <code>%Y.%m.%d</code>)</h4>
+<p>Configure how the date is displayed by the <code>status</code> command. All
+<a href="https://docs.python.org/3/library/datetime.html#format-codes">Python <code>strftime</code> directives</a>
+are supported.</p>
+<h4 id="optionslog_current-default-false"><code>options.log_current</code> (default: <code>false</code>)</h4>
+<p>If <code>true</code>, the output of the <code>log</code> command will include the currently running
+frame (if any) by default. The option can be overridden on the command line
+with the <code>-c/-C</code> or <code>--current/--no-current</code> flags.</p>
+<h4 id="optionspager-default-true"><code>options.pager</code> (default: <code>true</code>)</h4>
+<p>If <code>true</code>, the output of the <code>log</code>, <code>report</code> and <code>aggregate</code> commands will be
+run through a pager by default. The option can be overridden on the command
+line with the <code>-g/-G</code> or <code>--pager/--no-pager</code> flags. If other commands output
+in color, but these commands do not, try disabling the pager.</p>
+<h4 id="optionsreport_current-default-false"><code>options.report_current</code> (default: <code>false</code>)</h4>
+<p>If <code>true</code>, the output of the <code>report</code> and <code>aggregate</code> commands will include the
+currently running frame (if any) by default. The option can be overridden on the
+command line with the <code>-c/-C</code> or <code>--current/--no-current</code> flags.</p>
+<h4 id="optionsreverse_log-default-true"><code>options.reverse_log</code> (default: <code>true</code>)</h4>
+<p>If <code>true</code>, the output of the <code>log</code> command will reverse the order of the days
+to display the latest day&rsquo;s entries on top and the oldest day&rsquo;s entries at the
+bottom. The option can be overridden on the command line with the <code>-r/-R</code> or
+<code>--reverse/--no-reverse</code> flags.</p>
+<h4 id="optionsstop_on_start-default-false"><code>options.stop_on_start</code> (default: <code>false</code>)</h4>
+<p>If <code>true</code>, starting a new project will stop running projects:</p>
+<pre><code class="language-text">$ watson start samourai +pizza +cat
+Starting project samourai [pizza, cat] at 11:14
+$ watson start jayce +wheeled +warriors
+Stopping project samourai [pizza, cat], started 2 minutes ago and stopped just now. (id: d08cdd0)
+Starting project jayce [wheeled, warriors] at 11:16
+</code></pre>
+<p>Please note that it also works with serious stuff like:</p>
+<pre><code class="language-text">$ watson start voyager2 +reactor +module
+Stopping project jayce [wheeled, warriors], started 2 minutes ago and stopped just now. (id: 967965f)
+Starting project voyager2 [reactor, module] at 11:18
+</code></pre>
+<h4 id="optionsstop_on_restart-default-false"><code>options.stop_on_restart</code> (default: <code>false</code>)</h4>
+<p>Similar to the <code>options.stop_on_start</code> option, but for the
+<a href="../commands/#restart"><code>restart</code></a> command.</p>
+<h4 id="optionstime_format-default-hmsz"><code>options.time_format</code> (default: <code>%H:%M:%S%z</code>)</h4>
+<p>Configure how the time is displayed by the <code>status</code> command. All
+<a href="https://docs.python.org/3/library/datetime.html#format-codes">Python <code>strftime</code> directives</a>
+are supported.</p>
+<h4 id="optionsweek_start-default-monday"><code>options.week_start</code> (default: <code>monday</code>)</h4>
+<p>Globally configure which day corresponds to the start of a week. Allowed
+values are <code>monday</code>, <code>tuesday</code>, <code>wednesday</code>, <code>thursday</code>, <code>friday</code>,
+<code>saturday</code>, and <code>sunday</code>.</p>
+<h3 id="default-tags">Default tags</h3>
+<p>Tags can be automatically added for selected projects. This is convenient when
+the same tags are always attached to a particular project.</p>
+<p>These automatically attached tags are defined in the <code>[default_tags]</code> section of
+the configuration. Each option in that section is a project to which tags should
+be attached. The entries should follow the pattern: <code>project = tag1 tag2</code>.</p>
+<p>You can set default tags for a project from the command line:</p>
+<pre><code class="language-text">$ watson config default_tags.python101 'teaching python'
+</code></pre>
+<p>This corresponds to the following configuration file snippet:</p>
+<pre><code class="language-ini">[default_tags]
+python101 = teaching python
+</code></pre>
+<p>With these default tags set, the tags &ldquo;teaching&rdquo; and &ldquo;python&rdquo; will
+automatically be attached to the project &ldquo;python101&rdquo;:</p>
+<pre><code class="language-text">$ watson start python101
+Starting project python101 [teaching, python] at 19:27
+
+$ watson start python101 +lecture
+Starting project python101 [lecture, teaching, python] at 19:28
+</code></pre>
+<p>Default tags can contain space characters when written in between quotes:</p>
+<pre><code class="language-text">$ watson config default_tags.voyager2 'nasa &quot;space mission&quot;'
+</code></pre>
+<p>Or in the configuration file:</p>
+<pre><code class="language-ini">[default_tags]
+voyager2 = nasa 'space mission'
+</code></pre>
+<h2 id="sample-configuration-file">Sample configuration file</h2>
+<p>A basic configuration file looks like the following:</p>
+<pre><code class="language-ini"># Watson configuration
+
+[backend]
+url = https://my.server.com/api/
+token = yourapitoken
+
+[options]
+stop_on_start = true
+stop_on_restart = false
+date_format = %Y.%m.%d
+time_format = %H:%M:%S%z
+week_start = monday
+log_current = false
+pager = true
+report_current = false
+reverse_log = true
+</code></pre>
+<h2 id="application-folder">Application folder</h2>
+<p>To override Watson&rsquo;s default application folder (see
+<a href="#the-configuration-file">the configuration file</a>), you can set the
+<code>$WATSON_DIR</code> environment variable to the desired path.</p>
+<p>It may be defined globally in your shell profile:</p>
+<pre><code class="language-bash"># .bashrc or .profile
+export WATSON_DIR=/path/to/watson/folder
+</code></pre>
+<p>or when calling Watson:</p>
+<pre><code class="language-bash">$ WATSON_DIR=/path/to/watson/folder watson status
+</code></pre>
+<p>This can be useful to preserve your real data when hacking with Watson :)</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Watson, by TailorDev &amp; friends is released under the MIT License.</p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+        <script src="../../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

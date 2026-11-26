@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="A wonderful CLI to track your time!">
+        <meta name="author" content="TailorDev">
+        
+        <link rel="shortcut icon" href="img/favicon.ico">
+        <title>Watson</title>
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/fontawesome.min.css" rel="stylesheet">
+        <link href="css/brands.min.css" rel="stylesheet">
+        <link href="css/solid.min.css" rel="stylesheet">
+        <link href="css/v4-font-face.min.css" rel="stylesheet">
+        <link href="css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/docco.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <link href="css/watson.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body class="homepage">
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href=".">Watson</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="." class="nav-link active" aria-current="page">Home</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">User Guide</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="user-guide/commands/" class="dropdown-item">Commands</a>
+</li>
+                                    
+<li>
+    <a href="user-guide/configuration/" class="dropdown-item">Configuration</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Contributing</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="contributing/how-to/" class="dropdown-item">How to</a>
+</li>
+                                    
+<li>
+    <a href="contributing/hack/" class="dropdown-item">Hack</a>
+</li>
+                                    
+<li>
+    <a href="contributing/pr-guidelines/" class="dropdown-item">Pull Request guidelines</a>
+</li>
+                                    
+<li>
+    <a href="contributing/coc/" class="dropdown-item">Code of Conduct</a>
+</li>
+                                    
+<li>
+    <a href="contributing/release-new-version/" class="dropdown-item">Release a new version</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a href="faq/" class="nav-link">FAQ</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">About</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="about/license/" class="dropdown-item">License</a>
+</li>
+                                    
+<li>
+    <a href="about/release-notes/" class="dropdown-item">Release notes</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" class="nav-link disabled">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="user-guide/commands/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="https://github.com/jmaupetit/Watson" class="nav-link"><i class="fa-brands fa-github"></i> GitHub</a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="2"><a href="#overview" class="nav-link">Overview</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            
+            <li class="nav-item" data-bs-level="2"><a href="#installation" class="nav-link">Installation</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            
+            <li class="nav-item" data-bs-level="2"><a href="#getting-started" class="nav-link">Getting started</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<p><img alt="logo Watson" src="img/logo-watson-600px.png" /></p>
+<h2 id="overview">Overview</h2>
+<p>Watson is here to help you monitor your time. You want to know how
+much time you are spending on your projects? You want to generate a nice
+report for your client? Watson is here for you.</p>
+<p>Tell Watson when you start working on a task with the <code>start</code> command.
+Then, when you are done, stop the timer with the <code>stop</code>
+command. This will create what we call a <strong>frame</strong>. That&rsquo;s pretty much
+everything you need to know to start using Watson.</p>
+<p>Each frame records a project, optional tags, and its start and stop times. Your
+tags can be shared across projects and can be used to generate detailed reports.</p>
+<p>Watson stores everything on your computer, but you can go wild and
+upload to your own <a href="https://github.com/TailorDev/crick">crick server</a>
+via the <code>sync</code> command to store your sessions remotely and share them
+with your colleagues.</p>
+<p><img alt="screenshot" src="img/screenshot.png" /></p>
+<h2 id="installation">Installation</h2>
+<p>Watson is available on any platform supported by Python (Windows, macOS,
+Linux, *BSD…). The easiest way to install it is to use
+<a href="https://docs.astral.sh/uv/">uv</a>:</p>
+<pre><code class="language-bash">$ uv tool install td-watson
+</code></pre>
+<p>This creates an isolated environment for Watson and makes the <code>watson</code> command
+available in your <code>PATH</code>.</p>
+<p>Alternatively, you can use
+<a href="https://pip.pypa.io/en/stable/installation/">pip</a> inside a virtual environment:</p>
+<pre><code class="language-bash">$ pip install td-watson
+</code></pre>
+<p>On macOS, you can also install Watson using <a href="https://brew.sh/">Homebrew</a>:</p>
+<pre><code class="language-bash">$ brew update &amp;&amp; brew install watson
+</code></pre>
+<h3 id="distribution-packages">Distribution packages</h3>
+<p>You can install Watson using available distribution packages.</p>
+<h4 id="arch-linux">Arch Linux</h4>
+<p>A <code>PKGBUILD</code> file for building an Arch Linux package is available in the
+<a href="https://aur.archlinux.org/packages/watson/">AUR</a>. You can build and
+install it using <a href="https://wiki.archlinux.org/title/Makepkg">makepkg</a>
+or an <a href="https://wiki.archlinux.org/title/AUR_helpers">AUR helper</a>.
+Please refer to the official documentation for more information on
+installing AUR packages.</p>
+<h3 id="single-user-installation">Single user installation</h3>
+<p>You can choose to install Watson for your user only by running:</p>
+<pre><code class="language-bash">$ pip install --user td-watson
+</code></pre>
+<p>If after this the <code>watson</code> command is not available, you need to add
+<code>~/.local/bin/</code> to your <code>PATH</code>. If your terminal is Bash, you can do this by
+running:</p>
+<pre><code class="language-bash">$ echo 'export PATH=&quot;$HOME/.local/bin:$PATH&quot;' &gt;&gt; ~/.bashrc  # Add ~/.local/bin/ to your .bashrc PATH
+</code></pre>
+<p>and restarting your terminal session or sourcing the <code>.bashrc</code>:</p>
+<pre><code class="language-bash">$ source ~/.bashrc  # Reload your .bashrc
+</code></pre>
+<h3 id="development-version">Development version</h3>
+<p>The latest development version can be installed with
+<a href="https://docs.astral.sh/uv/">uv</a> using the following commands:</p>
+<pre><code class="language-bash">$ git clone https://github.com/jmaupetit/Watson.git
+$ cd Watson/
+$ make bootstrap
+$ uv run watson --version
+</code></pre>
+<h3 id="command-line-completion">Command line completion</h3>
+<h4 id="bash">Bash</h4>
+<p>If you use a Bash-compatible shell, you can install the <code>watson.completion</code> file
+from the source distribution as <code>/etc/bash_completion.d/watson</code> - or wherever
+your distribution keeps the Bash completion configuration files. After you
+restart your shell, you can then just type <code>watson</code> on your command line and
+then hit <code>TAB</code> to see all available commands. Depending on your input, it
+completes <code>watson</code> commands, command options, projects, tags and frame IDs.</p>
+<h4 id="zsh">ZSH</h4>
+<p>If you use zsh, copy the file <code>watson.zsh-completion</code> somewhere in your
+<code>fpath</code> as <code>_watson</code>. For example, you can put it in
+<code>/usr/local/share/zsh/site-functions</code>:</p>
+<pre><code class="language-text">cp watson.zsh-completion /usr/local/share/zsh/site-functions/_watson
+</code></pre>
+<p>Make sure that your <code>.zshrc</code> enables compinit:</p>
+<pre><code class="language-text">autoload -Uz compinit &amp;&amp; compinit
+</code></pre>
+<h4 id="fish">Fish</h4>
+<p>If you use fish, you can copy or symlink the file <code>watson.fish</code> from the source
+distribution to <code>~/.config/fish/completions/watson.fish</code>. You may need to make
+the completions directory as it is not created by default.</p>
+<p>Once this is done, re-source your fish config:
+<code>source ~/.config/fish/config.fish</code></p>
+<p>You will now have command completion for fish, including the completion of known
+projects, tags, and frames.</p>
+<h2 id="getting-started">Getting started</h2>
+<p>Now that <code>watson</code> is installed on your system, let&rsquo;s start tracking your
+activity:</p>
+<pre><code class="language-bash">$ watson start world-domination +cats
+</code></pre>
+<p>With this command, you have started a new <strong>frame</strong> for the <em>world-domination</em>
+project with the <em>cats</em> tag. Time is running. Now, you need to work on your
+project. Let&rsquo;s do this. Now.</p>
+<p><img alt="Working cat" src="img/working-cat.gif" width="400px" /></p>
+<p>Welcome back! Now that your world domination plan has been set up, let&rsquo;s stop
+time tracking via:</p>
+<pre><code class="language-bash">$ watson stop
+Stopping project world-domination [cats], started 34 minutes ago and stopped just now. (id: 166d1fb)
+</code></pre>
+<p>To list all available commands, either
+<a href="user-guide/commands/">explore the commands documentation</a> or use:</p>
+<pre><code class="language-bash">$ watson help
+</code></pre>
+<p>We hope you will enjoy Watson!</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Watson, by TailorDev &amp; friends is released under the MIT License.</p>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = ".",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="js/base.js"></script>
+        <script src="search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
+
+<!--
+MkDocs version : 1.6.1
+Build Date UTC : 2026-11-26 08:43:33.441090+00:00
+-->
