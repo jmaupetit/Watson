@@ -1,6 +1,6 @@
 [project]
 name = "td-watson"
-version = "3.0.1"
+version = "3.0.2"
 description = "A wonderful CLI to track your time!"
 authors = [
   { name = "Yannick Péroux", email = "yannick.peroux@gmail.com" },

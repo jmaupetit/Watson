@@ -8,9 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [3.0.2] - 2026-11-26
+
 ### Fixed
 
-- Remove broken "Edit on GitHub" links from the documentation (#548)
+- Remove broken "Edit on GitHub" links from the documentation
 - Sync release notes documentation page with the CHANGELOG (symlink)
 
 ## [3.0.1] - 2026-11-23
@@ -360,7 +362,8 @@ and this project adheres to
 
 First stable public release 🎉
 
-[unreleased]: https://github.com/jmaupetit/watson/compare/v3.0.1...HEAD
+[unreleased]: https://github.com/jmaupetit/watson/compare/v3.0.2...HEAD
+[3.0.2]: https://github.com/jmaupetit/watson/compare/v3.0.1...v3.0.2
 [3.0.1]: https://github.com/jmaupetit/watson/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/jmaupetit/watson/compare/2.1.0...3.0.0
 [2.1.0]: https://github.com/jmaupetit/watson/compare/2.0.1...2.1.0
