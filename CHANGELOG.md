@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Remove broken "Edit on GitHub" links from the documentation (#548)
+
 ## [3.0.1] - 2026-11-23
 
 ### Fixed

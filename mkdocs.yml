@@ -2,6 +2,7 @@ site_name: Watson
 theme: flatly
 repo_url: https://github.com/jmaupetit/Watson
 repo_name: GitHub
+edit_uri: ''
 site_description: A wonderful CLI to track your time!
 site_author: TailorDev
 copyright: Watson, by TailorDev &amp; friends is released under the MIT License.
